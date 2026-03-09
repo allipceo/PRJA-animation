@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What is K-SCool? — For Reinsurance Underwriters</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0e1a;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  }
+
+  #stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+  }
+
+  .scene.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .scene-bg {
+    width: 100%;
+    height: 88vh;
+    object-fit: contain;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -54%);
+  }
+
+  /* 상단 헤더 */
+  #header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(10,14,26,0.9) 0%, transparent 100%);
+    z-index: 100;
+  }
+
+  #deck-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #deck-tag {
+    background: rgba(0,184,255,0.15);
+    border: 1px solid rgba(0,184,255,0.35);
+    color: #00b8ff;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 3px;
+  }
+
+  #deck-title {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+
+  #scene-counter {
+    color: rgba(255,255,255,0.35);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* 하단 슬라이드 정보 패널 */
+  #info-panel {
+    position: fixed;
+    bottom: 46px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(700px, 82%);
+    background: rgba(10,14,26,0.75);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 10px 20px;
+    text-align: center;
+    z-index: 100;
+  }
+
+  #slide-step {
+    color: #00b8ff;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  #slide-topic {
+    color: rgba(255,255,255,0.82);
+    font-size: 0.83rem;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+
+  /* 진행 바 */
+  #progress-bar-wrap {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.07);
+    z-index: 100;
+  }
+
+  #progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #0047cc, #00b8ff);
+    transition: width 0.35s ease;
+  }
+
+  /* 스텝 도트 */
+  #step-dots {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 101;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: background 0.3s, transform 0.3s;
+    cursor: pointer;
+  }
+
+  .dot.active {
+    background: #00b8ff;
+    transform: scale(1.4);
+  }
+
+  /* 네비게이션 버튼 */
+  .nav-btn {
+    position: fixed;
+    bottom: 24px;
+    z-index: 200;
+    background: rgba(10,14,26,0.6);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-btn:hover {
+    background: rgba(0,114,255,0.5);
+    border-color: #00b8ff;
+    transform: scale(1.1);
+  }
+
+  .nav-btn:active { transform: scale(0.95); }
+
+  .nav-btn.disabled {
+    opacity: 0.18;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  #btn-prev { left: 24px; }
+  #btn-next { right: 24px; }
+
+  .nav-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="scene" id="scene-0"><img class="scene-bg" src="../_library/F2.jpg" alt=""></div>
+  <div class="scene" id="scene-1"><img class="scene-bg" src="../_library/F3.jpg" alt=""></div>
+  <div class="scene" id="scene-2"><img class="scene-bg" src="../_library/F6.jpg" alt=""></div>
+  <div class="scene" id="scene-3"><img class="scene-bg" src="../_library/F7.jpg" alt=""></div>
+  <div class="scene" id="scene-4"><img class="scene-bg" src="../_library/F8.jpg" alt=""></div>
+</div>
+
+<div id="header">
+  <div id="deck-info">
+    <span id="deck-tag">Reinsurance</span>
+    <span id="deck-title">What is K-SCool?</span>
+  </div>
+  <span id="scene-counter">1 / 5</span>
+</div>
+
+<div id="info-panel">
+  <div id="slide-step"></div>
+  <p id="slide-topic"></p>
+</div>
+
+<div id="progress-bar-wrap">
+  <div id="progress-bar"></div>
+</div>
+
+<div id="step-dots">
+  <div class="dot" data-i="0"></div>
+  <div class="dot" data-i="1"></div>
+  <div class="dot" data-i="2"></div>
+  <div class="dot" data-i="3"></div>
+  <div class="dot" data-i="4"></div>
+</div>
+
+<button class="nav-btn disabled" id="btn-prev" aria-label="Previous">
+  <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+</button>
+<button class="nav-btn" id="btn-next" aria-label="Next">
+  <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+</button>
+
+<script>
+  const SLIDES = [
+    {
+      step: 'Step 1 · Market Opportunity',
+      topic: '$3T+ uninsured digital assets — insurance penetration below 1%'
+    },
+    {
+      step: 'Step 2 · The Real Barrier',
+      topic: 'The underwriting barrier is not volatility — it is Forensic Ambiguity'
+    },
+    {
+      step: 'Step 3 · The Solution',
+      topic: 'K-SCool eliminates Forensic Ambiguity with a Hardware-Based Binary Oracle'
+    },
+    {
+      step: 'Step 4 · How It Works',
+      topic: 'Samsung Knox Warranty Bit — a verifiable, immutable claim trigger'
+    },
+    {
+      step: 'Step 5 · What Changes',
+      topic: 'K-SCool transforms uninsurable Cyber Risk into insurable Product Liability Risk'
+    }
+  ];
+
+  const TOTAL = SLIDES.length;
+  let current = 0;
+
+  const progressBar  = document.getElementById('progress-bar');
+  const sceneCounter = document.getElementById('scene-counter');
+  const slideStep    = document.getElementById('slide-step');
+  const slideTopic   = document.getElementById('slide-topic');
+  const btnPrev      = document.getElementById('btn-prev');
+  const btnNext      = document.getElementById('btn-next');
+  const dots         = document.querySelectorAll('.dot');
+
+  function showScene(index) {
+    document.querySelectorAll('.scene').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === index));
+    sceneCounter.textContent = `${index + 1} / ${TOTAL}`;
+    slideStep.textContent    = SLIDES[index].step;
+    slideTopic.textContent   = SLIDES[index].topic;
+    progressBar.style.width  = ((index + 1) / TOTAL * 100) + '%';
+    btnPrev.classList.toggle('disabled', index === 0);
+    btnNext.classList.toggle('disabled', index === TOTAL - 1);
+  }
+
+  btnPrev.addEventListener('click', () => { if (current > 0) showScene(--current); });
+  btnNext.addEventListener('click', () => { if (current < TOTAL - 1) showScene(++current); });
+
+  dots.forEach(d => {
+    d.addEventListener('click', () => { current = +d.dataset.i; showScene(current); });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { if (current < TOTAL-1) showScene(++current); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { if (current > 0)       showScene(--current); }
+  });
+
+  showScene(0);
+</script>
+</body>
+</html>
